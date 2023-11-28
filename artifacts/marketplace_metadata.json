@@ -1,0 +1,64 @@
+{
+	"compiler": {
+		"version": "0.8.22+commit.4fc1097e"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"inputs": [],
+				"name": "manager",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"marketplace.sol": "marketplace"
+		},
+		"evmVersion": "shanghai",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"marketplace.sol": {
+			"keccak256": "0xd2bf1b14722b10d0f948b9338918fa5d5165e03c85aaf92b163c76e0e32b416f",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://2f4b1a50090aafe096d3d03d8925a2c2fa4b994c5041ee6e7471cb72e971a5c6",
+				"dweb:/ipfs/QmZmu16tJaD7XKBBmebQJcbv6XHHh7AuZU3k5gZgwm1NoM"
+			]
+		}
+	},
+	"version": 1
+}
