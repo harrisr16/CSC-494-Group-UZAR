@@ -11,4 +11,7 @@ contract marketplace {
     constructor() {
         manager = msg.sender;
     }
+    function addItem(uint id, string memory location, string memory name, int quant, int price, string memory datearrive) public{
+        
+    }
 }
