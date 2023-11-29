@@ -21,6 +21,10 @@ contract marketplace {
         string dataarrived;
 
     }
+    struct representive{
+        address rep;
+        string location;
+    }
     item[] public spreadsheat;
     function addItem(
         address user,
