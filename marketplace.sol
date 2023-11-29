@@ -11,7 +11,33 @@ contract marketplace {
     constructor() {
         manager = msg.sender;
     }
-    function addItem(uint id, string memory location, string memory name, int quant, int price, string memory datearrive) public{
-        
+    struct item{
+        address user;
+        uint id;
+        string location;
+        string name;
+        int quant;
+        int price;
+        string dataarrived;
+
+    }
+    item[] public spreadsheat;
+    function addItem(
+        address user,
+        uint256 id,
+        string memory location,
+        string memory name,
+        int256 quant,
+        int256 price,
+        string memory datearrive
+    ) public {item storage newSpreadsheat = spreadsheat.push();require(user == manager,"only the manager may use this function");
+        newSpreadsheat.user = user;
+        newSpreadsheat.id = id;
+        newSpreadsheat.location = location;
+        newSpreadsheat.name = name;
+        newSpreadsheat.quant = quant;
+        newSpreadsheat.price = price;
+        newSpreadsheat.dataarrived = datearrive;
+
     }
 }
