@@ -24,8 +24,10 @@ contract marketplace {
     struct representive{
         address rep;
         string location;
+        int idrep;
     }
     item[] public spreadsheat;
+    representive[] public representives;
     function addItem(
         address user,
         uint256 id,
@@ -44,4 +46,10 @@ contract marketplace {
         newSpreadsheat.dataarrived = datearrive;
 
     }
+    function changeMarketPrice (address adreps, uint idreps,  uint id, int price) public{
+        require(adreps == representives[idreps].rep, "you must be a representive");
+        representives[id].price = price
+
+    }
+    
 }
