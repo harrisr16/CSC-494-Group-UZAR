@@ -11,23 +11,24 @@ contract marketplace {
     constructor() {
         manager = msg.sender;
     }
-    struct item{
+
+    struct item {
         address user;
-        uint id;
+        uint256 id;
         string location;
         string name;
-        int quant;
-        int price;
+        int256 quant;
+        int256 price;
         string dataarrived;
-
     }
-    struct representive{
+    struct representive {
         address rep;
         string location;
-        int idrep;
+        int256 idrep;
     }
     item[] public spreadsheat;
     representive[] public representives;
+
     function addItem(
         address user,
         uint256 id,
@@ -36,7 +37,9 @@ contract marketplace {
         int256 quant,
         int256 price,
         string memory datearrive
-    ) public {item storage newSpreadsheat = spreadsheat.push();require(user == manager,"only the manager may use this function");
+    ) public {
+        item storage newSpreadsheat = spreadsheat.push();
+        require(user == manager, "only the manager may use this function");
         newSpreadsheat.user = user;
         newSpreadsheat.id = id;
         newSpreadsheat.location = location;
@@ -44,12 +47,18 @@ contract marketplace {
         newSpreadsheat.quant = quant;
         newSpreadsheat.price = price;
         newSpreadsheat.dataarrived = datearrive;
-
     }
-    function changeMarketPrice (address adreps, uint idreps,  uint id, int price) public{
-        require(adreps == representives[idreps].rep, "you must be a representive");
-        representives[id].price = price
 
+    function changeMarketPrice(
+        address adreps,
+        uint256 idreps,
+        uint256 id,
+        int256 price
+    ) public {
+        require(
+            adreps == representives[idreps].rep,
+            "you must be a representive"
+        );
+        spreadsheat[id].price = price;
     }
-    
 }
