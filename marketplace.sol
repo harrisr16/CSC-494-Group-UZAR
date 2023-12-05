@@ -1,11 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0
 // Uriel Roque
-// Randy Harris
 // Zachary McNay
+// Andy Maratea
+// Randy Harris
 
 pragma solidity ^0.8.17;
+import "solidity-json-writer/contracts/JsonWriter.sol";
 
 contract marketplace {
+    using JsonWriter for JsonWriter.Json;
     address public manager;
 
     constructor() {
@@ -13,40 +16,70 @@ contract marketplace {
     }
 
     struct item {
-        address user;
         uint256 id;
         string location;
         string name;
         int256 quant;
         int256 price;
-        string dataarrived;
+        uint256 dateArrived;
     }
-    struct representive {
+
+    struct representative {
         address rep;
         string location;
         int256 idrep;
     }
-    item[] public spreadsheat;
-    representive[] public representives;
+
+    struct request {
+        address rep;
+        item[] requestedList;
+    }
+
+    item[] public itemList;
+    representative[] public representatives;
+    JsonWriter.Json[] public publishedItems;
 
     function addItem(
-        address user,
         uint256 id,
         string memory location,
         string memory name,
         int256 quant,
-        int256 price,
-        string memory datearrive
+        int256 price
     ) public {
-        item storage newSpreadsheat = spreadsheat.push();
-        require(user == manager, "only the manager may use this function");
-        newSpreadsheat.user = user;
-        newSpreadsheat.id = id;
-        newSpreadsheat.location = location;
-        newSpreadsheat.name = name;
-        newSpreadsheat.quant = quant;
-        newSpreadsheat.price = price;
-        newSpreadsheat.dataarrived = datearrive;
+        item storage newItem = itemList.push();
+        require(
+            msg.sender == manager,
+            "Only the manager may use this feature!"
+        );
+        newItem.id = id;
+        newItem.location = location;
+        newItem.name = name;
+        newItem.quant = quant;
+        newItem.price = price;
+        newItem.dateArrived = block.timestamp;
+    }
+
+    function publishItem(
+        uint256 id,
+        string memory location,
+        string memory name,
+        uint256 quantity,
+        uint256 price,
+        uint256 dateArrived
+    ) public view {
+        require(
+            msg.sender == manager,
+            "Only the manager may use this feature!"
+        );
+        JsonWriter.Json memory itemWriter;
+
+        itemWriter = itemWriter.writeStartObject();
+        itemWriter = itemWriter.writeUintProperty("ID", id);
+        itemWriter = itemWriter.writeStringProperty("Location", location);
+        itemWriter = itemWriter.writeStringProperty("Name", name);
+        itemWriter = itemWriter.writeUintProperty("Quantity", quantity);
+        itemWriter = itemWriter.writeUintProperty("Price", price);
+        itemWriter = itemWriter.writeUintProperty("Date Arrived", dateArrived);
     }
 
     function changeMarketPrice(
@@ -56,9 +89,9 @@ contract marketplace {
         int256 price
     ) public {
         require(
-            adreps == representives[idreps].rep,
-            "you must be a representive"
+            adreps == representatives[idreps].rep,
+            "you must be a representatives"
         );
-        spreadsheat[id].price = price;
+        itemList[id].price = price;
     }
 }
