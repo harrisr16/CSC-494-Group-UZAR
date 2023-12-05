@@ -42,6 +42,7 @@ contract marketplace {
     item[] public itemList;
     representative[] public representatives;
     string[] public publishedItems;
+    item[] public marketplaceItems;
     mapping(address => request) requests;
 
     function addItem(
@@ -62,6 +63,26 @@ contract marketplace {
         newItem.quant = quant;
         newItem.price = price;
         newItem.dateArrived = block.timestamp;
+    }
+
+    function addRep(address rep, string memory location) public {
+        require(msg.sender == manager);
+        require(bytes(location).length > 0, "Location cannot be null!");
+        representative memory newRep;
+        newRep.rep = rep;
+        newRep.location = location;
+
+        representatives.push(newRep);
+    }
+
+    function removeRep(address addr) public {
+        require(msg.sender == manager);
+        for (uint i = 0; i < representatives.length; i++) 
+        {
+            if (representatives[i].rep == addr) {
+                delete representatives[i];
+            }
+        }
     }
 
     function publishItems() public {
@@ -97,19 +118,6 @@ contract marketplace {
             itemWriter = itemWriter.writeEndObject();
             publishedItems.push(itemWriter.value);
         }
-    }
-
-    function changeMarketPrice(
-        address adreps,
-        uint256 idreps,
-        uint256 id,
-        uint256 price
-    ) public {
-        require(
-            adreps == representatives[idreps].rep,
-            "you must be a representatives"
-        );
-        itemList[id].price = price;
     }
 
     function isRep(address addr) public view returns (bool) {
@@ -189,10 +197,17 @@ contract marketplace {
     function isApproved(address addr) public {
         if (requests[addr].approvers >= representatives.length / 2) {
             requests[addr].approved = true;
+            for (uint256 i = 0; i < requests[addr].requestedList.length; i++) {
+                marketplaceItems.push(requests[addr].requestedList[i]);
+            }
         }
     }
 
-    function itemToString(item memory currItem) public pure returns (string memory) {
+    function itemToString(item memory currItem)
+        public
+        pure
+        returns (string memory)
+    {
         string memory itemString;
         // uint256 id;
         // string location;
@@ -218,20 +233,59 @@ contract marketplace {
         return itemString;
     }
 
-    function publishMarket() public view returns (string[] memory) {
-        string[] memory marketplaces;
-        for (uint256 i = 0; i < representatives.length; i++) {
-            string memory mktplace;
-            request storage currRequest = requests[representatives[i].rep];
-            for (uint256 j = 0; j < currRequest.requestedList.length; j++) {
-                mktplace = string.concat(
-                    mktplace,
-                    "\n",
-                    itemToString(currRequest.requestedList[j])
-                );
-            }
-            marketplaces[i] = mktplace;
+    function publishMarket() public view returns (string memory) {
+        require(isRep(msg.sender));
+        string memory mktplace;
+        for (uint256 j = 0; j < marketplaceItems.length; j++) {
+            
+            mktplace = string.concat(
+                mktplace,
+                "\n----------------------------------\n",
+                itemToString(marketplaceItems[j])
+            );
         }
-        return marketplaces;
+        return mktplace;
+    }
+
+    function removeFromMarketplace(
+        uint256 id,
+        uint256 qty,
+        uint256 flag
+    ) public returns (uint256) {
+        require(isRep(msg.sender));
+        require(
+            flag == 0 || flag == 1 || flag == 2,
+            "Must choose a valid flag bit number (0, 1, or 2)!"
+        );
+        for (uint256 i = 0; i < marketplaceItems.length; i++) {
+            if (marketplaceItems[i].id == id) {
+                require(
+                    qty <= marketplaceItems[i].quant,
+                    string.concat(
+                        "Invalid quantity, current stock is: ",
+                        Strings.toString(marketplaceItems[i].quant),
+                        "!"
+                    )
+                );
+                if (qty == marketplaceItems[i].quant) {
+                    delete marketplaceItems[i];
+                }
+                marketplaceItems[i].quant -= qty;
+            }
+        }
+        //0 flag for purchased item
+        //1 flag for stolen item
+        //2 flag for destroyed item
+        return flag;
+    }
+
+    function changeMarketPrice(uint256 id, uint256 newPrice) public {
+        require(isRep(msg.sender));
+        require(newPrice > 0, "Price cannot be 0!");
+        for (uint256 i = 0; i < marketplaceItems.length; i++) {
+            if (marketplaceItems[i].id == id) {
+                marketplaceItems[i].price = newPrice;
+            }
+        }
     }
 }
