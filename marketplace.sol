@@ -35,6 +35,8 @@ contract marketplace {
         address requester;
         item[] requestedList;
         uint256 approvers;
+        mapping(address => bool) hasApproved;
+        bool approved;
     }
 
     item[] public itemList;
@@ -144,7 +146,7 @@ contract marketplace {
         return false;
     }
 
-    function requestItem(uint[] calldata ids) public {
+    function requestItem(uint256[] calldata ids) public {
         require(
             isRep(msg.sender),
             "You must be a representative to use this feature!"
@@ -154,14 +156,82 @@ contract marketplace {
         currRequest.approvers = 0;
 
         for (uint256 i = 0; i < ids.length; i++) {
-            string memory warnStatement = string.concat("Not a valid item ID at ID number: ", Strings.toString(ids[i]), "!");
+            string memory warnStatement = string.concat(
+                "Not a valid item ID at ID number: ",
+                Strings.toString(ids[i]),
+                "!"
+            );
             require(isValidID(ids[i]), warnStatement);
-            for (uint j = 0; j < itemList.length; j++) 
-            {
+            for (uint256 j = 0; j < itemList.length; j++) {
                 if (itemList[j].id == ids[i]) {
                     currRequest.requestedList.push(itemList[j]);
                 }
             }
         }
+    }
+
+    function approveRequest(address addr) public {
+        require(
+            !requests[addr].approved,
+            "This request has already been approved!"
+        );
+        require(
+            isRep(msg.sender),
+            "You must be a representative to use this feature!"
+        );
+        require(
+            !requests[addr].hasApproved[addr],
+            "You have already approved this request!"
+        );
+        requests[addr].approvers += 1;
+    }
+
+    function isApproved(address addr) public {
+        if (requests[addr].approvers >= representatives.length / 2) {
+            requests[addr].approved = true;
+        }
+    }
+
+    function itemToString(item memory currItem) public pure returns (string memory) {
+        string memory itemString;
+        // uint256 id;
+        // string location;
+        // string name;
+        // uint256 quant;
+        // uint256 price;
+        // uint256 dateArrived;
+        itemString = string.concat(
+            "ID: ",
+            Strings.toString(currItem.id),
+            "\nLocation: ",
+            currItem.location,
+            "\nName: ",
+            currItem.name,
+            "\nQuantity: ",
+            Strings.toString(currItem.quant),
+            "\nPrice: ",
+            Strings.toString(currItem.price),
+            "\nDate Arrived: ",
+            Strings.toString(currItem.dateArrived)
+        );
+
+        return itemString;
+    }
+
+    function publishMarket() public view returns (string[] memory) {
+        string[] memory marketplaces;
+        for (uint256 i = 0; i < representatives.length; i++) {
+            string memory mktplace;
+            request storage currRequest = requests[representatives[i].rep];
+            for (uint256 j = 0; j < currRequest.requestedList.length; j++) {
+                mktplace = string.concat(
+                    mktplace,
+                    "\n",
+                    itemToString(currRequest.requestedList[j])
+                );
+            }
+            marketplaces[i] = mktplace;
+        }
+        return marketplaces;
     }
 }
