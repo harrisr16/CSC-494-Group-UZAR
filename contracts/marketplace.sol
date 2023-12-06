@@ -4,7 +4,7 @@
 // Andy Maratea
 // Randy Harris
 
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.20;
 import "solidity-json-writer/contracts/JsonWriter.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 

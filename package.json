@@ -14,8 +14,11 @@
     "create-react-app": "^5.0.1",
     "ganache-cli": "^6.12.2",
     "mocha": "^10.2.0",
-    "solc": "^0.8.17",
+    "solc": "^0.8.20",
     "solidity-json-writer": "^1.1.0",
     "web3": "^1.8.0"
+  },
+  "devDependencies": {
+    "hardhat": "^2.19.2"
   }
 }
