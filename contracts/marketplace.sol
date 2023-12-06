@@ -8,7 +8,7 @@ pragma solidity ^0.8.17;
 import "solidity-json-writer/contracts/JsonWriter.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-contract marketplace {
+contract Marketplace {
     using JsonWriter for JsonWriter.Json;
     address public manager;
 
