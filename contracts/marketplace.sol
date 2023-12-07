@@ -235,7 +235,6 @@ contract Marketplace {
     }
 
     function publishMarket() public view returns (string memory) {
-        require(isRep(msg.sender));
         string memory mktplace;
         for (uint256 j = 0; j < marketplaceItems.length; j++) {
             
