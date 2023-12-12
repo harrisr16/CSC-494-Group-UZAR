@@ -12,3 +12,16 @@ beforeEach(async () =>{
   user = await new web3.eth.Contract(abi}.deploy({data: bytecode}).send({from: accounts[0], gasPrice: 8000000000, gas: 4700000});
 });
 
+describe("Market Place", () =>{
+  //deploy test contract
+  it("deploy test", () =>{
+    assert.ok(user.option.address);
+  });
+//------------------------------------------------------------------------------------------------------------------------------------
+  //add item test
+  //add item
+  it("Add Item", async() =>{
+    await user.methods.addItem(1, "123 new street", "john", 5, 2).send({from:accounts[0], gasPrice:8000000000, gas: 4700000});
+    assert.equal(await user.methods.itemList(0).call(), accounts[0]);
+  }
+});
