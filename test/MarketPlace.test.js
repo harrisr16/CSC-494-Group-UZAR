@@ -8,3 +8,7 @@ const { abi, bytecode } = require('../compile')
 let accounts;
 let user;
 beforeEach(async () =>{
+  accounts = await web3.eth.getAccounts();
+  user = await new web3.eth.Contract(abi}.deploy({data: bytecode}).send({from: accounts[0], gasPrice: 8000000000, gas: 4700000});
+});
+
