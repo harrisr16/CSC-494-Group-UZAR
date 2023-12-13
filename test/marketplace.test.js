@@ -532,4 +532,5 @@ describe("Marketplace", () => {
     //         chai.assert.include(error.message, "only the manager can use the function");
     //     }
     // });
+	
 });
