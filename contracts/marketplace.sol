@@ -154,6 +154,10 @@ contract Marketplace {
         return false;
     }
 
+    function getRequestAddress(address addr) public view returns (address){
+        return requests[addr].requester;
+    }
+
     function requestItem(uint256[] calldata ids) public {
         require(
             isRep(msg.sender),
