@@ -575,14 +575,91 @@ describe("Marketplace", () => {
 	// requestItem test
 	// requestItem
 	it("Requests an item", async () => {
-        await marketplace.methods.addRep(accounts[1], "SU").send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
-        await marketplace.methods.addItem(1, "SU", "Tea", 5, 2).send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
-        await marketplace.methods.requestItem([1]).send({ from: accounts[1], gasPrice: 8000000000, gas: 4700000 });
+		await marketplace.methods.addRep(accounts[1], "SU").send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+		await marketplace.methods.addItem(1, "SU", "Tea", 5, 2).send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+		await marketplace.methods.requestItem([1]).send({ from: accounts[1], gasPrice: 8000000000, gas: 4700000 });
 
-        const request = await marketplace.methods.getRequestAddress(accounts[1]).call();
+		const request = await marketplace.methods.getRequestAddress(accounts[1]).call();
 
 		assert.equal(request, accounts[1]);
-    });
+	});
+
+	it("Fails to request items for nonrep", async () => {
+		await marketplace.methods.addItem(1, "SU", "Tea", 10, 5).send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+		try {
+			await marketplace.methods.requestitem([1]).send({ from: accounts[1], gasPrice: 8000000000, gas: 4700000 });
+			assert.fail("This should produce an error!");
+		} catch (error) {
+			chai.assert.include(error.message, "", "Test failed!");
+		}
+	});
+
+	it("Fails due to bad id", async () => {
+		await marketplace.methods.addRep(accounts[0], "SU").send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+		await marketplace.methods.addItem(1, "SU", "Tea", 10, 5).send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+		try {
+			await marketplace.methods.requestItem([1]).send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+			assert.fail("This should produce an error!");
+		} catch (error) {
+			chai.assert.include(error.message, "", "Test failed!");
+		}
+	});
+
+	//---------------------------------------------------------------------------------------------------------------------------------
+	// approveRequest test
+	// approveRequest
+	it("Approves a request", async () => {
+		await marketplace.methods.addRep(accounts[0], "Landrum").send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+		await marketplace.methods.addItem(1, "SU", "Tea", 5, 2).send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+		await marketplace.methods.requestItem([1]).send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+		await marketplace.methods.approveRequest(accounts[0]).send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+
+		const item = await marketplace.methods.marketplaceItems(0).call();
+
+		assert.equal(item.name, "Tea");
+	});
+
+	it("Attempts to approve a request with bad permissions", async () => {
+		await marketplace.methods.addRep(accounts[0], "Landrum").send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+		await marketplace.methods.addItem(1, "SU", "Tea", 5, 2).send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+		await marketplace.methods.requestItem([1]).send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+
+		try {
+			await marketplace.methods.approveRequest(accounts[0]).send({ from: accounts[1], gasPrice: 8000000000, gas: 4700000 });
+			assert.fail("This should produce an error!");
+		} catch (error) {
+			chai.assert.include(error.message, "", "Test failed!");
+		}
+	});
+
+	it("Attempts to approve an already approved request", async () => {
+		await marketplace.methods.addRep(accounts[0], "Landrum").send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+		await marketplace.methods.addRep(accounts[1], "Landrum").send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+		await marketplace.methods.addItem(1, "SU", "Tea", 5, 2).send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+		await marketplace.methods.requestItem([1]).send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+		await marketplace.methods.approveRequest(accounts[1]).send({ from: accounts[1], gasPrice: 8000000000, gas: 4700000 });
+
+		try {
+			await marketplace.methods.approveRequest(accounts[0]).send({ from: accounts[1], gasPrice: 8000000000, gas: 4700000 });
+			assert.fail("This should produce an error!");
+		} catch (error) {
+			chai.assert.include(error.message, "", "Test failed!");
+		}
+	});
+
+	it("Attempts to double approve a request", async () => {
+		await marketplace.methods.addRep(accounts[0], "Landrum").send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+		await marketplace.methods.addItem(1, "SU", "Tea", 5, 2).send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+		await marketplace.methods.requestItem([1]).send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+		await marketplace.methods.approveRequest(accounts[0]).send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+
+		try {
+			await marketplace.methods.approveRequest(accounts[0]).send({ from: accounts[0], gasPrice: 8000000000, gas: 4700000 });
+			assert.fail("This should produce an error!");
+		} catch (error) {
+			chai.assert.include(error.message, "", "Test failed!");
+		}
+	});
 
 	//---------------------------------------------------------------------------------------------------------------------------------
 	// removeFromMarketplace test
