@@ -446,7 +446,7 @@ const bytecode = "608060405234801561000f575f80fd5b50335f806101000a81548173ffffff
 
 const provider = new HDWalletProvider(
     //Secret phrase
-    'notable child question panel acquire silly language elder pepper mammal model mixture',
+    'SECRET PHRASE HERE',
     //Goerli endpoint
     'https://goerli.infura.io/v3/2ac8acc85c5846dab223331aec2c1bbf'
 );
